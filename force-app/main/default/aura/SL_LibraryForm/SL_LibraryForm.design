@@ -1,0 +1,7 @@
+<design:component>
+    <design:attribute name="isStandardPage" label="Is standard page or button quick action" />
+    <design:attribute name="isMultiSelect" label="Is multi select" />
+    <design:attribute name="isAbleToDelete" label="Is able to delete selected files" />
+    <design:attribute name="libraryName" label="Library Name" />
+    <design:attribute name="isShowUploadButton" label="Is able to show upload button" />
+</design:component>

@@ -1,0 +1,122 @@
+<template>
+
+    <templete if:false={showSpinner}>
+
+        <div class='select-file-parent-class'>
+            <div class="select-file-inner-class">
+                Select Files
+            </div>
+            <hr class="hr-margin-class">
+        </div>
+
+        <div class="div-search-upload-class">
+            <div class="search-style-class">
+                <lightning-input type="search" placeholder="Search Files..." value={searchValue}
+                    onchange={changeSearchElement} autocomplete="off">
+                </lightning-input>
+            </div>
+
+            <div if:true={isShowUploadButton}>
+                <lightning-input label="" name="Upload Files" onchange={uploadFileHandler} type="file" multiple>
+                </lightning-input>
+            </div>
+        </div>
+
+        <hr class="hr-margin-style-class">
+
+        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+
+            <template for:each={listOfFiles} for:item="record">
+
+                <li role="presentation" class="slds-listbox__item li-style-class" key={record.Id}>
+
+                    <div class="div-parent-record">
+                        <div class="div-inner-record">
+
+                            <span if:true={record.disableDeleteCreatedFiles}>
+                                <lightning-input type="checkbox" data-id={record.Id} onchange={handleCheckboxChange}
+                                    checked={record.isChecked} disabled={record.disableDeleteCreatedFiles}>
+                                </lightning-input>
+                            </span>
+                            <span if:false={record.disableDeleteCreatedFiles}>
+                                <lightning-input type="checkbox" data-id={record.Id} onchange={handleCheckboxChange}
+                                    checked={record.isChecked} disabled={record.isDisable}>
+                                </lightning-input>
+                            </span>
+                        </div>
+                        <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta icon-style-class"
+                            role="option">
+
+                            <span>
+                                <lightning-icon icon-name='{record.iconName}' size="middle">
+                                </lightning-icon>
+                            </span>
+
+                            <span class="slds-media__body span-parent-class">
+                                <span
+                                    class="slds-listbox__option-text slds-listbox__option-text_entity span-inner-class"
+                                    title={record.Title}>
+                                    {record.Title}</span>
+                                <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+                                    {record.LastModifiedDate} •
+                                    {record.ContentSize} •
+                                    {record.FileExtension}</span>
+                            </span>
+
+                        </div>
+                    </div>
+                    <div class="icon-hover-class" if:true={record.hasBeenCreated} data-id={record.Id}
+                        onmouseenter={display} onmouseleave={displayOut}>
+                        <lightning-icon icon-name='utility:info' size="small">
+                        </lightning-icon>
+
+                        <span if:true={record.showMessage} class="span-inoformation-class">
+                            <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom-right span-inoformation-inner-class"
+                                role="tooltip">
+                                <div class="slds-popover__body">This file has been already added to this Entity.
+                                    If you would like to remove it, just uncheck record. If you are not able it
+                                    means you have no access.
+                                </div>
+                            </div>
+                        </span>
+
+                    </div>
+                </li>
+                <hr class="hr-margin-second-style-class" key={record.Id}>
+            </template>
+
+            <div if:false={listOfFiles.length} class="empty-result-class">
+                There are no records due to your search!
+            </div>
+
+        </ul>
+
+        <div class="slds-modal__footer div-footer-class">
+
+            <span class="count-style-class">
+                {selectedFileCount} of {fileCount} files selected
+            </span>
+
+            <span>
+                <span>
+                    <lightning-button label="Cancel" title="Close window" onclick={closeWindow}>
+                    </lightning-button>
+                </span>
+                <span class="add-button-class">
+                    <lightning-button label="Submit" title="Submit files" onclick={addFilesHandler}
+                        disabled={disableAddButton}>
+                    </lightning-button>
+                </span>
+            </span>
+
+        </div>
+    </templete>
+
+    <templete if:true={showSpinner}>
+        <div>
+            <lightning-spinner class="spinner-style-class" alternative-text="Loading" size="large">
+            </lightning-spinner>
+        </div>
+    </templete>
+
+</template>

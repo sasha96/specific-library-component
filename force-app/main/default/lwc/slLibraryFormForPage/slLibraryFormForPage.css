@@ -1,0 +1,100 @@
+.select-file-parent-class{
+    position: inherit;
+}
+
+.select-file-inner-class{
+    padding: 21px 7px 10px 0px;
+    display: flex;
+    justify-content: center;
+    line-height: 28px; 
+    font-size: large;
+}
+
+.hr-margin-class{
+    margin: 0 0 0 0 ;
+}
+
+.div-search-upload-class{
+    display: flex;
+    justify-content: space-between;
+    padding-left: 2rem;
+    padding-right: 3rem;
+}
+
+.search-style-class{
+    width: 23rem;
+}
+
+.hr-margin-style-class{
+    margin: 15px 0px 0px ;
+} 
+
+.li-style-class{
+    display:flex;
+    justify-content: space-between;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.hr-margin-second-style-class{
+    margin: 0 0 0 0;
+} 
+
+.empty-result-class{
+    padding: 1rem;
+}
+
+.div-footer-class{
+    display:flex; 
+    justify-content:space-between;
+}
+
+.count-style-class{
+    padding-top: 5px; 
+    padding-left: 15px;
+}
+
+.add-button-class{
+    margin-left: 10px;
+}
+
+.spinner-style-class{
+    position: relative; 
+    display: contents;
+}
+
+.div-parent-record{
+    display: flex;max-width: 30rem;
+}
+
+.div-inner-record{
+    padding-top: 10px; 
+}
+
+.icon-style-class{
+    min-width: 29rem;
+}
+
+.span-parent-class{
+    padding-left: 10px;
+}
+
+.span-inner-class{
+    color: dodgerblue; 
+    max-width: 26rem;
+}
+
+.icon-hover-class{
+    padding-top: 7px;
+}
+
+.span-inoformation-class{
+    position:relative;
+}
+
+.span-inoformation-inner-class{
+    left: -19.3rem;
+    top: -5.3rem;
+    width: 21rem;
+    position:absolute
+}

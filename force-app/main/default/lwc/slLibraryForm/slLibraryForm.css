@@ -1,0 +1,109 @@
+.select-file-parent-class{
+    position: absolute ; 
+    background-color: white ; 
+    z-index: 1; 
+    width: 38.8rem ; 
+    margin-left: -32px ;
+}
+
+.select-file-inner-class{
+    padding: 21px 7px 10px 0px;
+    display: flex;
+    justify-content: center;
+    line-height: 28px; 
+    font-size: large;
+}
+
+.hr-margin-class{
+    margin: 0 0 0 0 ;
+}
+
+.search-style-class{
+    margin-top: -17px; 
+    padding-top: 4rem;
+}
+
+.upload-style-class{
+    padding-bottom: 5px; 
+}
+
+.hr-margin-style-class{
+    margin: 15px -32px 0px ;
+} 
+
+.ul-style-class{
+    min-height: 22.5rem;
+}
+
+.li-style-class{
+    display:flex;
+    justify-content: space-between;
+}
+
+.hr-margin-second-style-class{
+    margin: 0px -32px 0px;
+} 
+
+.empty-result-class{
+    padding: 1rem;
+}
+
+.div-footer-class{
+    position: sticky; 
+    bottom: -17px; 
+    margin-bottom: -17px; 
+    margin-right: -32px; 
+    margin-left: -31px; 
+    display:flex; 
+    justify-content:space-between;
+}
+
+.count-style-class{
+    padding-top: 5px; 
+    padding-left: 15px;
+}
+
+.add-button-class{
+    margin-left: 10px;
+}
+
+.spinner-style-class{
+    position: relative; 
+    display: contents;
+}
+
+.div-parent-record{
+    display: flex;max-width: 30rem;
+}
+
+.div-inner-record{
+    padding-top: 10px; 
+}
+
+.icon-style-class{
+    min-width: 29rem;
+}
+
+.span-parent-class{
+    padding-left: 10px;
+}
+
+.span-inner-class{
+    color: dodgerblue; 
+    max-width: 26rem;
+}
+
+.icon-hover-class{
+    padding-top: 7px;
+}
+
+.span-inoformation-class{
+    position:relative;
+}
+
+.span-inoformation-inner-class{
+    left: -19.3rem;
+    top: -5.3rem;
+    width: 21rem;
+    position:absolute
+}
