@@ -1,7 +1,7 @@
 .select-file-parent-class{
     position: absolute ; 
     background-color: white ; 
-    z-index: 1; 
+    z-index: 3; 
     width: 38.8rem ; 
     margin-left: -32px ;
 }

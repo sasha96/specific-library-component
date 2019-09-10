@@ -1,26 +1,51 @@
 <aura:component
-    implements="force:lightningQuickActionWithoutHeader,force:hasRecordId, force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome">
-    <aura:attribute type="Boolean" name="isStandardPage" default="false" />
+    implements="lightning:availableForFlowScreens, force:lightningQuickActionWithoutHeader,force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome"
+    controller="SL_ctrl_LibraryFormHandler">
+    <aura:attribute type="String" name="mode" default="quick action" />
     <aura:attribute type="Boolean" name="isMultiSelect" default="true" />
     <aura:attribute type="Boolean" name="isAbleToDelete" default="true" />
-    <aura:attribute type="String" name="libraryName" default="Inside Use Only" />
     <aura:attribute type="Boolean" name="isShowUploadButton" default="true" />
+    <aura:attribute type="String" name="folderName" />
     <aura:attribute type="String" name="recordId" />
+    <aura:attribute type="String" name="recordIds" default="" />
+    <aura:attribute type="Boolean" name="loadAllData" default="false" />
+    <aura:attribute type="String" name="getLibraryId" />
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
-    <aura:if isTrue="{!v.isStandardPage}">
-        <div style="border: 1px solid black;background-color: white;">
-            <c:slLibraryFormForPage recordId="{!v.recordId}" oncloseWindow="{!c.closeModalWindow}"
-                isMultiSelect="{!v.isMultiSelect}" isAbleToDelete="{!v.isAbleToDelete}" libraryName="{!v.libraryName}"
-                isShowUploadButton="{!v.isShowUploadButton}">
-            </c:slLibraryFormForPage>
-        </div>
-        <aura:set attribute="else">
+    <aura:if isTrue="{!v.loadAllData}">
+
+        <aura:if isTrue="{!v.mode == 'quick action'}">
             <c:slLibraryForm recordId="{!v.recordId}" oncloseWindow="{!c.closeModalWindow}"
-                isMultiSelect="{!v.isMultiSelect}" isAbleToDelete="{!v.isAbleToDelete}" libraryName="{!v.libraryName}"
-                isShowUploadButton="{!v.isShowUploadButton}">
+                isMultiSelect="{!v.isMultiSelect}" isAbleToDelete="{!v.isAbleToDelete}"
+                isShowUploadButton="{!v.isShowUploadButton}" folderName="{!v.folderName}">
             </c:slLibraryForm>
-        </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mode == 'component on page'}">
+            <div style="border: 1px solid black;background-color: white;">
+                <c:slLibraryFormForPage recordId="{!v.recordId}" oncloseWindow="{!c.closeModalWindow}"
+                    isMultiSelect="{!v.isMultiSelect}" isAbleToDelete="{!v.isAbleToDelete}"
+                    isShowUploadButton="{!v.isShowUploadButton}" folderName="{!v.folderName}">
+                </c:slLibraryFormForPage>
+            </div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mode == 'flow element'}">
+            <aura:if isTrue="{!!v.folderName}">
+                <c:SL_LookupMulti objectName="ContentDocument" objApiName="ContentDocument"
+                    searchField="  LatestPublishedVersion.Title " iconParam="standard:file" searchName="Search files"
+                    soslParams="{!  ' Id IN (SELECT ContentDocumentId FROM ContentWorkspaceDoc  WHERE ContentWorkspace.Id = ' + v.getLibraryId + ') ' }"
+                    limitOfRecords="10" isForFlow="true" recordId="{!v.recordIds}" />
+            </aura:if>
+            <aura:if isTrue="{!v.folderName}">
+                <c:SL_LookupMulti objectName="ContentDocument" objApiName="ContentFolderItem" searchField="  Title "
+                    iconParam="standard:file" searchName="Search files"
+                    soslParams="{!  ' parentcontentfolderid IN ( SELECT id FROM ContentFolder WHERE Name = ' +  v.folderName  + ' and ParentContentFolderId = ' + v.getLibraryId + ')  ' }"
+                    limitOfRecords="10" isForFlow="true" recordId="{!v.recordIds}" />
+            </aura:if>
+        </aura:if>
+
     </aura:if>
+
 </aura:component>

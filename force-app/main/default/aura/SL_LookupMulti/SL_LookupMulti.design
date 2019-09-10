@@ -1,0 +1,10 @@
+<design:component>
+    <design:attribute name="objectName" label="Object name" />
+    <design:attribute name="objApiName" label="Object api name " />
+    <design:attribute name="searchField" label="Field for Search" />
+    <design:attribute name="iconParam" label="Icon name" />
+    <design:attribute name="searchName" label="Placeholder text" />
+    <design:attribute name="soslParams" label="SOSL params" />
+    <design:attribute name="limitOfRecords" label="Records limit" />
+    <design:attribute name="recordId" label="Default selected record id" />
+</design:component>

@@ -1,11 +1,15 @@
 import { LightningElement, api, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getLibraryItemsByName from "@salesforce/apex/SL_ctrl_LibraryFormHandler.getLibraryItemsByName";
 import saveFile from "@salesforce/apex/SL_ctrl_LibraryFormHandler.saveFile";
 import createRemoveLinks from "@salesforce/apex/SL_ctrl_LibraryFormHandler.createRemoveLinks";
+import getLibraryName from "@salesforce/apex/SL_ctrl_LibraryFormHandler.getLibraryName";
+import getFilesFromFolder from "@salesforce/apex/SL_ctrl_LibraryFormHandler.getFilesFromFolder";
+import saveFileInFolder from "@salesforce/apex/SL_ctrl_LibraryFormHandler.saveFileInFolder";
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-export default class SlLibraryFormForPage extends LightningElement {
+export default class SlLibraryFormForPage extends NavigationMixin(LightningElement) {
 
     @api libraryName;
     @api isShowUploadButton;
@@ -15,6 +19,7 @@ export default class SlLibraryFormForPage extends LightningElement {
     @api showSpinner = false;
     @api disableAddButton = false;
     @api recordId;
+    @api folderName;
     @api lstCreatedLinks;
     @track libraryRecord = "";
     @track initialListOfFiles = "";
@@ -33,7 +38,55 @@ export default class SlLibraryFormForPage extends LightningElement {
 
         this.showSpinner = true;
         this.disableAddButton = true;
-        this.initialize();
+
+        if (this.folderName) {
+            this.finElementFromFolder();
+        } else {
+            this.findLibraryName();
+        }
+    }
+
+    finElementFromFolder() {
+
+        getFilesFromFolder({
+            folderName: this.folderName,
+            recordId: this.recordId
+        })
+            .then(result => {
+                this.prepareAllDate(result);
+
+            })
+            .catch(error => {
+                const toastEvnt = new ShowToastEvent({
+                    title: 'Error',
+                    message: 'Error happend when you tried to retrieve files from folder. ' + error.body.message,
+                    variant: 'error',
+                    duration: 5000
+                });
+                this.dispatchEvent(toastEvnt);
+                this.closeWindow();
+            })
+    }
+
+    /*find library name */
+    findLibraryName() {
+
+        getLibraryName()
+            .then(result => {
+                this.libraryName = JSON.parse(result).Library_Name__c;
+                this.initialize();
+            })
+            .catch(error => {
+
+                const toastEvnt = new ShowToastEvent({
+                    title: 'Error',
+                    message: 'Error happend when you tried to retrieve name of library. ' + error.body.message,
+                    variant: 'error',
+                    duration: 5000
+                });
+                this.dispatchEvent(toastEvnt);
+                this.closeWindow();
+            })
     }
 
     /* initialize method */
@@ -44,52 +97,8 @@ export default class SlLibraryFormForPage extends LightningElement {
             recordId: this.recordId
         })
             .then(result => {
-                var returnedData = JSON.parse(result);
-                var lstCreatedLinks = returnedData.lstCreatedLinks;
-                this.lstCreatedLinks = lstCreatedLinks;
-                this.libraryRecord = returnedData.libraryRecord;
 
-                var listOfFiles = [];
-                for (var i in returnedData.lstFiles) {
-                    var fileExt = returnedData.lstFiles[i].LatestPublishedVersion.FileExtension.toLowerCase();
-                    if (fileExt === 'png' || fileExt === 'jpg' || fileExt === 'gif' || fileExt === 'tiff') {
-                        fileExt = 'image';
-                    }
-
-                    listOfFiles.push({
-                        Id: returnedData.lstFiles[i].Id,
-                        Title: returnedData.lstFiles[i].LatestPublishedVersion.Title,
-                        LastModifiedDate: this.formatDatehelper(new Date(returnedData.lstFiles[i].LatestPublishedVersion.LastModifiedDate)),
-                        ContentSize: this.formatSizeHelper(returnedData.lstFiles[i].LatestPublishedVersion.ContentSize),
-                        FileExtension: fileExt,
-                        iconName: 'doctype:' + fileExt,
-                        isChecked: false,
-                        isDisable: false,
-                        hasBeenCreated: false,
-                        showMessage: false,
-                        disableDeleteCreatedFiles: false
-                    });
-                }
-
-                var selectedFileCount = 0;
-                listOfFiles.forEach(file => {
-                    lstCreatedLinks.forEach(createdFile => {
-                        if (createdFile.ContentDocumentId === file.Id) {
-                            file.isChecked = true;
-                            file.hasBeenCreated = true;
-                            selectedFileCount++;
-                        }
-                        if (file.hasBeenCreated && !this.isAbleToDelete) {
-                            file.disableDeleteCreatedFiles = true;
-                        }
-                    })
-                });
-
-                this.selectedFileCount = selectedFileCount;
-                this.listOfFiles = listOfFiles;
-                this.initialListOfFiles = listOfFiles;
-                this.fileCount = listOfFiles.length;
-                this.showSpinner = false;
+                this.prepareAllDate(result);
             })
             .catch(error => {
                 const toastEvnt = new ShowToastEvent({
@@ -179,6 +188,56 @@ export default class SlLibraryFormForPage extends LightningElement {
 
     }
 
+    /* prepare all data before showing */
+    prepareAllDate(result) {
+        var returnedData = JSON.parse(result);
+        var lstCreatedLinks = returnedData.lstCreatedLinks;
+        this.lstCreatedLinks = returnedData.lstCreatedLinks;;
+        this.libraryRecord = returnedData.libraryRecord;
+
+        var listOfFiles = [];
+        for (var i in returnedData.lstFolderItems) {
+            var fileExt = returnedData.lstFolderItems[i].FileExtension.toLowerCase();
+            if (fileExt === 'jpeg' || fileExt === 'png' || fileExt === 'jpg' || fileExt === 'gif' || fileExt === 'tiff') {
+                fileExt = 'image';
+            }
+
+            listOfFiles.push({
+                Id: returnedData.lstFolderItems[i].Id,
+                Title: returnedData.lstFolderItems[i].Title,
+                LastModifiedDate: this.formatDatehelper(new Date(returnedData.lstFolderItems[i].LastModifiedDate)),
+                ContentSize: this.formatSizeHelper(returnedData.lstFolderItems[i].ContentSize),
+                FileExtension: fileExt,
+                iconName: 'doctype:' + fileExt,
+                isChecked: false,
+                isDisable: false,
+                hasBeenCreated: false,
+                showMessage: false,
+                disableDeleteCreatedFiles: false
+            });
+        }
+
+        var selectedFileCount = 0;
+        listOfFiles.forEach(file => {
+            lstCreatedLinks.forEach(createdFile => {
+                if (createdFile.ContentDocumentId === file.Id) {
+                    file.isChecked = true;
+                    file.hasBeenCreated = true;
+                    selectedFileCount++;
+                }
+                if (file.hasBeenCreated && !this.isAbleToDelete) {
+                    file.disableDeleteCreatedFiles = true;
+                }
+            })
+        });
+
+        this.selectedFileCount = selectedFileCount;
+        this.listOfFiles = listOfFiles;
+        this.initialListOfFiles = listOfFiles;
+        this.fileCount = listOfFiles.length;
+        this.showSpinner = false;
+    }
+
     /* handler search method */
     changeSearchElement(event) {
 
@@ -209,7 +268,7 @@ export default class SlLibraryFormForPage extends LightningElement {
 
     /* handler upload new files method */
     uploadHelper() {
-
+        this.showSpinner = true;
         this.file = this.filesUploaded[0];
         var fileNames = [];
         for (var i = 0; i < this.filesUploaded.length; i++) {
@@ -224,32 +283,65 @@ export default class SlLibraryFormForPage extends LightningElement {
             this.content = this.fileContents.indexOf(base64) + base64.length;
             this.fileContents = this.fileContents.substring(this.content);
 
-            saveFile({
-                strFileNames: fileNames,
-                base64Data: encodeURIComponent(this.fileContents),
-                idOfLibrary: this.libraryRecord.Id
-            })
-                .then(result => {
-                    this.initialize();
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: 'Success!!',
-                            message: fileNames + ' - Uploaded Successfully!!!',
-                            variant: 'success',
-                        }),
-                    );
-
+            if (this.folderName) {
+                saveFileInFolder({
+                    strFileNames: fileNames,
+                    base64Data: encodeURIComponent(this.fileContents),
+                    idOfLibrary: this.libraryRecord.Id,
+                    folderName: this.folderName
                 })
-                .catch(error => {
-                    const toastEvnt = new ShowToastEvent({
-                        title: 'Error',
-                        message: 'Error happend when you tried to uploadHelper files',
-                        variant: 'error',
-                        duration: 5000
+                    .then(result => {
+                        this.finElementFromFolder();
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Success!!',
+                                message: fileNames + ' - Uploaded Successfully!!!',
+                                variant: 'success',
+                            }),
+                        );
+                        this.showSpinner = false;
+
+                    })
+                    .catch(error => {
+                        const toastEvnt = new ShowToastEvent({
+                            title: 'Error',
+                            message: 'Error happend when you tried to uploadHelper files.' + error.body.message,
+                            variant: 'error',
+                            duration: 5000
+                        });
+                        this.dispatchEvent(toastEvnt);
+                        this.showSpinner = false;
                     });
-                    this.dispatchEvent(toastEvnt);
-                });
+            } else {
+                saveFile({
+                    strFileNames: fileNames,
+                    base64Data: encodeURIComponent(this.fileContents),
+                    idOfLibrary: this.libraryRecord.Id
+                })
+                    .then(result => {
+                        this.initialize();
+                        this.dispatchEvent(
+                            new ShowToastEvent({
+                                title: 'Success!!',
+                                message: fileNames + ' - Uploaded Successfully!!!',
+                                variant: 'success',
+                            }),
+                        );
+                        this.showSpinner = false;
+                    })
+                    .catch(error => {
+                        const toastEvnt = new ShowToastEvent({
+                            title: 'Error',
+                            message: 'Error happend when you tried to uploadHelper files',
+                            variant: 'error',
+                            duration: 5000
+                        });
+                        this.dispatchEvent(toastEvnt);
+                        this.showSpinner = false;
+                    });
+            }
         });
+
 
         this.fileReader.readAsDataURL(this.file);
     }
@@ -261,6 +353,7 @@ export default class SlLibraryFormForPage extends LightningElement {
 
     /* method creates new file links and remove unchecked*/
     addFilesHandler(event) {
+
 
         this.showSpinner = true;
 
@@ -296,7 +389,7 @@ export default class SlLibraryFormForPage extends LightningElement {
                 this.showSpinner = false;
 
                 this.dispatchEvent(new CustomEvent('closeWindow', {
-                    detail: { refreshPage: true },
+                    detail: { reloadPage: true },
                 }));
 
             })
@@ -337,5 +430,20 @@ export default class SlLibraryFormForPage extends LightningElement {
             listOfFiles[item].showMessage = false;
         }
         this.listOfFiles = listOfFiles;
+    }
+
+    /*open file in new tab */
+    openFileInNewTab(event) {
+
+        var selectedId = event.target.dataset.id;
+
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: selectedId,
+                actionName: 'view'
+            }
+        });
+
     }
 }

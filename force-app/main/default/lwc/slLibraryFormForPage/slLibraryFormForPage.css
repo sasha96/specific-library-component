@@ -22,12 +22,22 @@
 }
 
 .search-style-class{
+    /*margin-top: -17px; 
+    padding-top: 4rem;*/
     width: 23rem;
+}
+
+.upload-style-class{
+    /*padding-bottom: 5px; */
 }
 
 .hr-margin-style-class{
     margin: 15px 0px 0px ;
 } 
+
+.ul-style-class{
+    /*min-height: 22.5rem;*/
+}
 
 .li-style-class{
     display:flex;
